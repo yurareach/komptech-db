@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Сервис{% endblock %}
+{% block page_title %}🔧 Сервисный центр{% endblock %}
+{% block content %}
+<div class="toolbar"><a href="/service/add" class="btn btn-success">➕ Новая заявка</a></div>
+<div class="card"><div class="tbl-wrap"><table>
+<tr><th>№</th><th>Дата</th><th>Клиент</th><th>Товар</th><th>Статус</th><th>Мастер</th><th>Описание</th><th></th></tr>
+{% for r in rows %}
+<tr>
+  <td><strong>#{{ r.request_id }}</strong></td><td>{{ r.dt }}</td>
+  <td>{{ r.client }}</td><td style="color:var(--dim)">{{ r.product }}</td>
+  <td><span class="badge {% if r.status=='выполнена' or r.status=='выдана' %}badge-green{% elif r.status=='в работе' %}badge-blue{% elif r.status=='отказано' %}badge-red{% else %}badge-yellow{% endif %}">{{ r.status }}</span></td>
+  <td style="color:var(--dim)">{{ r.master }}</td>
+  <td style="color:var(--dim);font-size:12px">{{ r.descr }}…</td>
+  <td>
+    <form method="post" action="/service/update/{{ r.request_id }}" style="display:flex;gap:4px">
+      <select name="status" style="padding:3px 6px;font-size:12px">
+        {% for s in ['принята','в работе','выполнена','отказано','выдана'] %}
+        <option {% if r.status==s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+      <button class="btn btn-ghost btn-sm" type="submit">💾</button>
+    </form>
+  </td>
+</tr>
+{% else %}<tr><td colspan="8" style="text-align:center;color:var(--dim);padding:32px">Заявок нет</td></tr>
+{% endfor %}
+</table></div></div>
+{% endblock %}

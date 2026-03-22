@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Отчёты{% endblock %}
+{% block page_title %}📊 Отчёты и аналитика{% endblock %}
+{% block content %}
+
+<div class="card">
+  <div class="card-title">🏆 Топ-10 товаров по продажам</div>
+  <div class="tbl-wrap"><table>
+    <tr><th>Место</th><th>Товар</th><th>Продано (шт.)</th><th>Выручка (₽)</th></tr>
+    {% for i, r in enumerate(top) %}
+    <tr>
+      <td><strong style="color:{% if i==0 %}#ffd700{% elif i==1 %}#c0c0c0{% elif i==2 %}#cd7f32{% else %}var(--dim){% endif %}">
+        {% if i==0 %}🥇{% elif i==1 %}🥈{% elif i==2 %}🥉{% else %}{{ i+1 }}{% endif %}
+      </strong></td>
+      <td>{{ r.name }}</td>
+      <td><span class="badge badge-blue">{{ r.qty }} шт.</span></td>
+      <td><strong style="color:var(--green)">{{ r.revenue }} ₽</strong></td>
+    </tr>
+    {% else %}<tr><td colspan="4" style="text-align:center;color:var(--dim);padding:20px">Продаж ещё не было</td></tr>
+    {% endfor %}
+  </table></div>
+</div>
+
+<div class="card">
+  <div class="card-title">📅 Продажи по периодам и категориям</div>
+  <div class="tbl-wrap"><table>
+    <tr><th>Период</th><th>Категория</th><th>Продано (шт.)</th><th>Выручка (₽)</th></tr>
+    {% for r in sales %}
+    <tr>
+      <td>{{ r.period }}</td>
+      <td>{{ r.cat }}</td>
+      <td>{{ r.qty }}</td>
+      <td><strong>{{ r.revenue }} ₽</strong></td>
+    </tr>
+    {% else %}<tr><td colspan="4" style="text-align:center;color:var(--dim);padding:20px">Данных нет</td></tr>
+    {% endfor %}
+  </table></div>
+</div>
+
+<div class="card">
+  <div class="card-title">💸 Дебиторская задолженность</div>
+  {% if debts %}
+  <div class="tbl-wrap"><table>
+    <tr><th>№ заказа</th><th>Дата</th><th>Клиент</th><th>Сумма заказа</th><th>Оплачено</th><th>Долг</th></tr>
+    {% for r in debts %}
+    <tr>
+      <td><a href="/orders/{{ r.order_id }}" style="color:var(--accent)">#{{ r.order_id }}</a></td>
+      <td>{{ r.dt }}</td>
+      <td>{{ r.client }}</td>
+      <td>{{ r.total_amount }} ₽</td>
+      <td style="color:var(--green)">{{ r.paid }} ₽</td>
+      <td><strong style="color:var(--red)">{{ r.debt }} ₽</strong></td>
+    </tr>
+    {% endfor %}
+  </table></div>
+  {% else %}
+  <div class="empty"><div class="ico">✅</div>Задолженностей нет — все заказы оплачены!</div>
+  {% endif %}
+</div>
+{% endblock %}

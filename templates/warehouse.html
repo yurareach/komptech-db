@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Склад{% endblock %}
+{% block page_title %}🏭 Склад — остатки{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Арт.</th><th>Товар</th><th>Категория</th><th>Остаток</th><th>Цена</th><th>Статус</th><th>Обновлено</th><th></th></tr>
+    {% for r in rows %}
+    <tr>
+      <td style="color:var(--dim)">{{ r.article or '—' }}</td>
+      <td><strong>{{ r.name }}</strong></td>
+      <td>{{ r.cat or '—' }}</td>
+      <td>
+        {% if r.badge=='zero' %}<span class="badge badge-red">{{ r.stock }} шт.</span>
+        {% elif r.badge=='low' %}<span class="badge badge-yellow">{{ r.stock }} шт.</span>
+        {% else %}<span class="badge badge-green">{{ r.stock }} шт.</span>{% endif %}
+      </td>
+      <td>{{ r.retail_price }} ₽</td>
+      <td>
+        {% if r.badge=='zero' %}<span style="color:var(--red)">❌ НЕТ</span>
+        {% elif r.badge=='low' %}<span style="color:var(--yellow)">⚠ МАЛО</span>
+        {% else %}<span style="color:var(--green)">✅ OK</span>{% endif %}
+      </td>
+      <td style="color:var(--dim)">{{ r.upd }}</td>
+      <td>
+        <form method="post" action="/warehouse/adjust/{{ r.product_id }}" style="display:flex;gap:6px;align-items:center">
+          <input name="qty" type="number" value="{{ r.stock }}" min="0" style="width:70px;padding:4px 8px">
+          <button class="btn btn-ghost btn-sm" type="submit">💾</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  </div>
+</div>
+{% endblock %}

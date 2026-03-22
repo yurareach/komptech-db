@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block page_title %}📊 Панель управления{% endblock %}
+{% block content %}
+
+<div class="stats">
+  <div class="stat">
+    <div class="num">{{ stats.products }}</div>
+    <div class="lbl">📦 Товаров в каталоге</div>
+  </div>
+  <div class="stat">
+    <div class="num">{{ stats.clients }}</div>
+    <div class="lbl">👥 Клиентов</div>
+  </div>
+  <div class="stat">
+    <div class="num">{{ stats.orders }}</div>
+    <div class="lbl">🛒 Всего заказов</div>
+  </div>
+  <div class="stat">
+    <div class="num" style="color:var(--green)">{{ stats.revenue | int }} ₽</div>
+    <div class="lbl">💰 Выручка (оплачено)</div>
+  </div>
+  <div class="stat">
+    <div class="num" style="color:{% if stats.new_orders > 0 %}var(--yellow){% else %}var(--green){% endif %}">{{ stats.new_orders }}</div>
+    <div class="lbl">🆕 Новых заказов</div>
+  </div>
+  <div class="stat">
+    <div class="num" style="color:{% if stats.low_stock > 0 %}var(--red){% else %}var(--green){% endif %}">{{ stats.low_stock }}</div>
+    <div class="lbl">⚠️ Товаров заканчивается</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🛒 Последние заказы</div>
+  {% if recent_orders %}
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>№</th><th>Дата</th><th>Клиент</th><th>Сумма</th><th>Статус</th><th></th></tr>
+    {% for o in recent_orders %}
+    <tr>
+      <td><strong>#{{ o.order_id }}</strong></td>
+      <td>{{ o.dt }}</td>
+      <td>{{ o.client }}</td>
+      <td>{{ o.total_amount }} ₽</td>
+      <td>
+        {% if o.status == 'новый' %}<span class="badge badge-yellow">{{ o.status }}</span>
+        {% elif o.status == 'оплачен' %}<span class="badge badge-blue">{{ o.status }}</span>
+        {% elif o.status == 'отгружен' %}<span class="badge badge-green">{{ o.status }}</span>
+        {% elif o.status == 'отменён' %}<span class="badge badge-red">{{ o.status }}</span>
+        {% else %}<span class="badge badge-gray">{{ o.status }}</span>{% endif %}
+      </td>
+      <td><a href="/orders/{{ o.order_id }}" class="btn btn-ghost btn-sm">Открыть →</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  </div>
+  {% else %}
+  <div class="empty"><div class="ico">🛒</div>Заказов пока нет</div>
+  {% endif %}
+</div>
+
+{% endblock %}

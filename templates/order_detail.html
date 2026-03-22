@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Заказ №{{ order.order_id }}{% endblock %}
+{% block page_title %}🛒 Заказ №{{ order.order_id }}{% endblock %}
+{% block content %}
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+  <div class="card">
+    <div class="card-title">📋 Информация о заказе</div>
+    <table style="width:100%">
+      <tr><td style="color:var(--dim);width:40%">Дата:</td><td>{{ order.dt }}</td></tr>
+      <tr><td style="color:var(--dim)">Клиент:</td><td><strong>{{ order.client_name }}</strong></td></tr>
+      <tr><td style="color:var(--dim)">Телефон:</td><td>{{ order.phone or '—' }}</td></tr>
+      <tr><td style="color:var(--dim)">Менеджер:</td><td>{{ order.manager_name }}</td></tr>
+      <tr><td style="color:var(--dim)">Сумма:</td><td><strong>{{ order.total_amount }} ₽</strong></td></tr>
+      <tr><td style="color:var(--dim)">Оплачено:</td><td style="color:var(--green)">{{ paid }} ₽</td></tr>
+      <tr><td style="color:var(--dim)">Долг:</td><td style="color:{% if order.total_amount - paid > 0 %}var(--red){% else %}var(--green){% endif %}">{{ (order.total_amount - paid)|round(2) }} ₽</td></tr>
+    </table>
+    <div style="margin-top:14px">
+      <form method="post" action="/orders/{{ order.order_id }}/status" style="display:flex;gap:8px;align-items:center">
+        <select name="status" style="flex:1">
+          {% for s in ['новый','оплачен','в сборке','отгружен','отменён'] %}
+          <option {% if order.status==s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-primary btn-sm" type="submit">Обновить</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💳 Добавить оплату</div>
+    <form method="post" action="/orders/{{ order.order_id }}/pay">
+      <div class="form-group">
+        <label>Сумма (₽)</label>
+        <input name="amount" type="number" step="0.01" value="{{ (order.total_amount - paid)|round(2) }}" required>
+      </div>
+      <div class="form-group">
+        <label>Способ оплаты</label>
+        <select name="payment_method">
+          <option>наличные</option><option selected>карта</option>
+          <option>перевод</option><option>онлайн</option>
+        </select>
+      </div>
+      <button class="btn btn-success" type="submit">💳 Провести оплату</button>
+    </form>
+    {% if payments %}
+    <div style="margin-top:14px;font-size:12px;color:var(--dim)">История оплат:</div>
+    {% for p in payments %}
+    <div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)">
+      {{ p.dt }} — {{ p.amount }} ₽ ({{ p.payment_method }})
+      <span class="badge {% if p.status=='проведён' %}badge-green{% else %}badge-red{% endif %}" style="font-size:10px">{{ p.status }}</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">📦 Позиции заказа</div>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>#</th><th>Товар</th><th>Кол-во</th><th>Цена</th><th>Скидка</th><th>Сумма</th></tr>
+    {% for it in items %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ it.name }}</td>
+      <td>{{ it.quantity }} шт.</td>
+      <td>{{ it.unit_price }} ₽</td>
+      <td>{% if it.discount_pct > 0 %}<span class="badge badge-yellow">{{ it.discount_pct }}%</span>{% else %}—{% endif %}</td>
+      <td><strong>{{ it.total }} ₽</strong></td>
+    </tr>
+    {% else %}<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:20px">Позиций пока нет</td></tr>
+    {% endfor %}
+  </table>
+  </div>
+
+  <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+    <div style="font-size:13px;font-weight:600;color:var(--accent2);margin-bottom:10px">➕ Добавить товар</div>
+    <form method="post" action="/orders/{{ order.order_id }}/add_item" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:2;min-width:200px">
+        <label style="display:block;color:var(--dim);font-size:11px;margin-bottom:4px">Товар</label>
+        <select name="product_id" id="prod_sel" onchange="setPrice(this)" required>
+          <option value="">— выберите товар —</option>
+          {% for p in products %}
+          <option value="{{ p.product_id }}" data-price="{{ p.retail_price }}">{{ p.name }} (ост: {{ p.stock }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="width:80px">
+        <label style="display:block;color:var(--dim);font-size:11px;margin-bottom:4px">Кол-во</label>
+        <input name="quantity" type="number" min="1" value="1" required>
+      </div>
+      <div style="width:110px">
+        <label style="display:block;color:var(--dim);font-size:11px;margin-bottom:4px">Цена (₽)</label>
+        <input name="unit_price" id="unit_price" type="number" step="0.01" required>
+      </div>
+      <div style="width:80px">
+        <label style="display:block;color:var(--dim);font-size:11px;margin-bottom:4px">Скидка %</label>
+        <input name="discount_pct" type="number" step="0.1" value="0" min="0" max="100">
+      </div>
+      <button class="btn btn-primary" type="submit">Добавить</button>
+    </form>
+  </div>
+</div>
+
+<a href="/orders" class="btn btn-ghost">← Назад к заказам</a>
+
+<script>
+function setPrice(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById('unit_price').value = opt.dataset.price || '';
+}
+</script>
+{% endblock %}

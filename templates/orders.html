@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Заказы{% endblock %}
+{% block page_title %}🛒 Заказы{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <a href="/orders/add" class="btn btn-success">➕ Новый заказ</a>
+  {% for s, label in [('','Все'),('новый','Новые'),('оплачен','Оплачен'),('в сборке','В сборке'),('отгружен','Отгружен'),('отменён','Отменён')] %}
+  <a href="/orders?status={{ s }}" class="btn {% if status==s %}btn-primary{% else %}btn-ghost{% endif %} btn-sm">{{ label }}</a>
+  {% endfor %}
+</div>
+<div class="card">
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>№</th><th>Дата</th><th>Клиент</th><th>Менеджер</th><th>Сумма</th><th>Оплачено</th><th>Долг</th><th>Статус</th><th></th></tr>
+    {% for r in rows %}
+    {% set debt = r.total_amount - r.paid %}
+    <tr>
+      <td><strong>#{{ r.order_id }}</strong></td>
+      <td>{{ r.dt }}</td>
+      <td>{{ r.client }}</td>
+      <td style="color:var(--dim)">{{ r.manager }}</td>
+      <td>{{ r.total_amount }} ₽</td>
+      <td style="color:var(--green)">{{ r.paid }} ₽</td>
+      <td style="color:{% if debt > 0 %}var(--red){% else %}var(--green){% endif %}">{{ debt }} ₽</td>
+      <td>
+        {% if r.status=='новый' %}<span class="badge badge-yellow">{{ r.status }}</span>
+        {% elif r.status=='оплачен' %}<span class="badge badge-blue">{{ r.status }}</span>
+        {% elif r.status=='отгружен' %}<span class="badge badge-green">{{ r.status }}</span>
+        {% elif r.status=='отменён' %}<span class="badge badge-red">{{ r.status }}</span>
+        {% else %}<span class="badge badge-gray">{{ r.status }}</span>{% endif %}
+      </td>
+      <td><a href="/orders/{{ r.order_id }}" class="btn btn-ghost btn-sm">Открыть →</a></td>
+    </tr>
+    {% else %}<tr><td colspan="9" style="text-align:center;color:var(--dim);padding:32px">Заказов нет</td></tr>
+    {% endfor %}
+  </table>
+  </div>
+</div>
+{% endblock %}

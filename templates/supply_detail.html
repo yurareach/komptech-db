@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Поставка №{{ supply.supply_id }}{% endblock %}
+{% block page_title %}🚚 Поставка №{{ supply.supply_id }}{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">📋 {{ supply.supplier_name }} — {{ supply.dt }}</div>
+  <p style="color:var(--dim)">Статус: {{ supply.status }} | Сумма: <strong>{{ supply.total_amount }} ₽</strong></p>
+</div>
+<div class="card">
+  <div class="card-title">📦 Позиции поставки</div>
+  <div class="tbl-wrap"><table>
+    <tr><th>#</th><th>Товар</th><th>Кол-во</th><th>Цена закупки</th><th>Сумма</th></tr>
+    {% for it in items %}
+    <tr><td>{{ loop.index }}</td><td>{{ it.name }}</td><td>{{ it.quantity }} шт.</td>
+    <td>{{ it.purchase_price }} ₽</td><td>{{ it.total }} ₽</td></tr>
+    {% else %}<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:20px">Пока пусто</td></tr>
+    {% endfor %}
+  </table></div>
+  <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+    <div style="font-size:13px;font-weight:600;color:var(--accent2);margin-bottom:10px">➕ Добавить товар</div>
+    <form method="post" action="/supplies/{{ supply.supply_id }}/add_item" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:2;min-width:200px"><label style="display:block;color:var(--dim);font-size:11px;margin-bottom:4px">Товар</label>
+        <select name="product_id" required><option value="">— выберите —</option>
+        {% for p in products %}<option value="{{ p.product_id }}">{{ p.name }}</option>{% endfor %}
+        </select></div>
+      <div style="width:80px"><label style="display:block;color:var(--dim);font-size:11px;margin-bottom:4px">Кол-во</label>
+        <input name="quantity" type="number" min="1" value="1" required></div>
+      <div style="width:120px"><label style="display:block;color:var(--dim);font-size:11px;margin-bottom:4px">Цена закупки ₽</label>
+        <input name="purchase_price" type="number" step="0.01" required></div>
+      <button class="btn btn-primary" type="submit">Добавить</button>
+    </form>
+  </div>
+</div>
+<a href="/supplies" class="btn btn-ghost">← Назад</a>
+{% endblock %}

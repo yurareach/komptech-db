@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Редактировать' if product else 'Добавить' }} товар{% endblock %}
+{% block page_title %}{{ '✏️ Редактировать' if product else '➕ Добавить' }} товар{% endblock %}
+{% block content %}
+<div class="card" style="max-width:600px">
+  <form method="post">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Наименование товара *</label>
+        <input name="name" value="{{ product.name if product else '' }}" required>
+      </div>
+      <div class="form-group">
+        <label>Артикул (SKU)</label>
+        <input name="article" value="{{ product.article if product else '' }}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Категория</label>
+        <select name="category_id">
+          <option value="">— не выбрана —</option>
+          {% for c in cats %}
+          <option value="{{ c.category_id }}" {% if product and product.category_id == c.category_id %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Производитель</label>
+        <select name="manufacturer_id">
+          <option value="">— не выбран —</option>
+          {% for m in manuf %}
+          <option value="{{ m.manufacturer_id }}" {% if product and product.manufacturer_id == m.manufacturer_id %}selected{% endif %}>{{ m.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Розничная цена (₽) *</label>
+        <input name="retail_price" type="number" step="0.01" value="{{ product.retail_price if product else '' }}" required>
+      </div>
+      <div class="form-group">
+        <label>Гарантийный срок (мес.)</label>
+        <input name="warranty_months" type="number" value="{{ product.warranty_months if product else 12 }}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Статус</label>
+        <select name="status">
+          {% for s in ['в наличии','под заказ','снят с продажи'] %}
+          <option {% if product and product.status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Описание</label>
+      <textarea name="description">{{ product.description if product else '' }}</textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-primary" type="submit">💾 Сохранить</button>
+      <a href="/products" class="btn btn-ghost">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

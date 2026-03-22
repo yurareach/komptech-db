@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Поставки{% endblock %}
+{% block page_title %}🚚 Поставки{% endblock %}
+{% block content %}
+<div class="toolbar"><a href="/supplies/add" class="btn btn-success">➕ Новая поставка</a></div>
+<div class="card"><div class="tbl-wrap"><table>
+<tr><th>№</th><th>Дата</th><th>Поставщик</th><th>Статус</th><th>Сумма</th><th>Позиций</th><th></th></tr>
+{% for r in rows %}
+<tr>
+  <td><strong>#{{ r.supply_id }}</strong></td><td>{{ r.dt }}</td><td>{{ r.supplier }}</td>
+  <td><span class="badge {% if r.status=='получена' %}badge-green{% elif r.status=='отменена' %}badge-red{% else %}badge-yellow{% endif %}">{{ r.status }}</span></td>
+  <td>{{ r.total_amount }} ₽</td><td>{{ r.items }}</td>
+  <td><a href="/supplies/{{ r.supply_id }}" class="btn btn-ghost btn-sm">Открыть →</a></td>
+</tr>
+{% else %}<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:32px">Поставок нет</td></tr>
+{% endfor %}
+</table></div></div>
+{% endblock %}

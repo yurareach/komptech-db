@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Новая заявка{% endblock %}
+{% block page_title %}➕ Новая гарантийная заявка{% endblock %}
+{% block content %}
+<div class="card" style="max-width:520px">
+  <form method="post">
+    <div class="form-group"><label>Клиент *</label>
+      <select name="client_id" required><option value="">— выберите клиента —</option>
+      {% for c in clients %}<option value="{{ c.client_id }}">{{ c.nm }}</option>{% endfor %}
+      </select></div>
+    <div class="form-group"><label>Товар *</label>
+      <select name="product_id" required><option value="">— выберите товар —</option>
+      {% for p in products %}<option value="{{ p.product_id }}">{{ p.name }}</option>{% endfor %}
+      </select></div>
+    <div class="form-group"><label>Описание проблемы *</label>
+      <textarea name="problem_desc" required placeholder="Опишите неисправность подробно..."></textarea></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-success" type="submit">✅ Создать заявку</button>
+      <a href="/service" class="btn btn-ghost">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

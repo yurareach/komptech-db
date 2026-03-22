@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Новый заказ{% endblock %}
+{% block page_title %}➕ Новый заказ{% endblock %}
+{% block content %}
+<div class="card" style="max-width:520px">
+  <form method="post">
+    <div class="form-group">
+      <label>Клиент *</label>
+      <select name="client_id" required>
+        <option value="">— выберите клиента —</option>
+        {% for c in clients %}<option value="{{ c.client_id }}">{{ c.nm }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Менеджер</label>
+      <select name="employee_id">
+        <option value="">— не назначен —</option>
+        {% for e in employees %}<option value="{{ e.employee_id }}">{{ e.nm }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Комментарий</label>
+      <textarea name="comment" placeholder="Необязательно..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-success" type="submit">✅ Создать заказ</button>
+      <a href="/orders" class="btn btn-ghost">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

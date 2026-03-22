@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Клиенты{% endblock %}
+{% block page_title %}👥 Клиенты{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <a href="/clients/add" class="btn btn-success">➕ Новый клиент</a>
+</div>
+<div class="card">
+  <form class="search-bar" method="get">
+    <input name="q" value="{{ search }}" placeholder="🔍 Поиск по имени, организации, телефону...">
+    <button class="btn btn-ghost" type="submit">Найти</button>
+    <a href="/clients" class="btn btn-ghost">Сбросить</a>
+  </form>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>#</th><th>Тип</th><th>Имя / Организация</th><th>Телефон</th><th>Email</th><th>Скидка</th><th>С нами с</th><th></th></tr>
+    {% for r in rows %}
+    <tr>
+      <td>{{ r.client_id }}</td>
+      <td><span class="badge {% if r.client_type=='юрлицо' %}badge-blue{% else %}badge-gray{% endif %}">{{ r.client_type }}</span></td>
+      <td><strong>{{ r.name }}</strong></td>
+      <td>{{ r.phone or '—' }}</td>
+      <td style="color:var(--dim)">{{ r.email or '—' }}</td>
+      <td>{% if r.discount_pct > 0 %}<span class="badge badge-green">{{ r.discount_pct }}%</span>{% else %}—{% endif %}</td>
+      <td style="color:var(--dim)">{{ r.reg }}</td>
+      <td><a href="/clients/edit/{{ r.client_id }}" class="btn btn-ghost btn-sm">✏️</a></td>
+    </tr>
+    {% else %}<tr><td colspan="8" style="text-align:center;color:var(--dim);padding:32px">Клиенты не найдены</td></tr>
+    {% endfor %}
+  </table>
+  </div>
+</div>
+{% endblock %}
